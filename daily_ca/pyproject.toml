@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "daily-ca"
+version = "0.1.0"
+description = "Fetch InsightsIAS-style daily UPSC current affairs into SQLite"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "requests>=2.31.0,<3",
+  "beautifulsoup4>=4.12.0,<5",
+  "lxml>=5.0.0,<6",
+  "python-dotenv>=1.0.0,<2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0,<9"]
+
+[project.scripts]
+daily-ca = "daily_ca.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["daily_ca*"]
+
+[tool.setuptools.package-data]
+daily_ca = ["schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,38 @@
+name: Daily CA fetch
+
+on:
+  schedule:
+    # 02:00 UTC ≈ morning IST window; adjust as needed
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: daily_ca
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Fetch today
+        env:
+          DAILY_CA_DATABASE_URL: sqlite:///./data/daily_ca.sqlite3
+          DAILY_CA_REQUEST_DELAY_SECONDS: "2"
+        run: |
+          python -m daily_ca init-db
+          python -m daily_ca fetch-today
+
+      - name: Upload SQLite artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-ca-db
+          path: daily_ca/data/daily_ca.sqlite3
+          if-no-files-found: warn
